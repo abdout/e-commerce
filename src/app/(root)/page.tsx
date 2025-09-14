@@ -1,47 +1,22 @@
 import React from "react";
 import { Card } from "@/components";
 import {getCurrentUser} from "@/lib/auth/actions";
-
-const products = [
-  {
-    id: 1,
-    title: "Air Max Pulse",
-    subtitle: "Men's Shoes",
-    meta: "6 Colour",
-    price: 149.99,
-    imageSrc: "/shoes/shoe-1.jpg",
-    badge: { label: "New", tone: "orange" as const },
-  },
-  {
-    id: 2,
-    title: "Air Zoom Pegasus",
-    subtitle: "Men's Shoes",
-    meta: "4 Colour",
-    price: 129.99,
-    imageSrc: "/shoes/shoe-2.webp",
-    badge: { label: "Hot", tone: "red" as const },
-  },
-  {
-    id: 3,
-    title: "InfinityRN 4",
-    subtitle: "Men's Shoes",
-    meta: "6 Colour",
-    price: 159.99,
-    imageSrc: "/shoes/shoe-3.webp",
-    badge: { label: "Trending", tone: "green" as const },
-  },
-  {
-    id: 4,
-    title: "Metcon 9",
-    subtitle: "Men's Shoes",
-    meta: "3 Colour",
-    price: 139.99,
-    imageSrc: "/shoes/shoe-4.webp",
-  },
-];
+import { getAllProducts } from "@/lib/actions/product";
 
 const Home = async () => {
   const user = await getCurrentUser();
+  const { products } = await getAllProducts({
+    page: 1,
+    limit: 4,
+    sort: "newest",
+    search: "",
+    genderSlugs: [],
+    brandSlugs: [],
+    categorySlugs: [],
+    sizeSlugs: [],
+    colorSlugs: [],
+    priceRanges: []
+  });
 
   console.log('USER:', user);
 
@@ -55,12 +30,10 @@ const Home = async () => {
           {products.map((p) => (
             <Card
               key={p.id}
-              title={p.title}
-              subtitle={p.subtitle}
-              meta={p.meta}
-              imageSrc={p.imageSrc}
-              price={p.price}
-              badge={p.badge}
+              title={p.name}
+              subtitle={p.subtitle ?? undefined}
+              imageSrc={p.imageUrl ?? "/shoes/shoe-1.jpg"}
+              price={p.minPrice !== null ? p.minPrice : undefined}
               href={`/products/${p.id}`}
             />
           ))}
