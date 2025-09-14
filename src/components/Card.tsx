@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import RiyalSymbol from "./RiyalSymbol";
 
 export type BadgeTone = "red" | "green" | "orange";
 
@@ -35,7 +36,12 @@ export default function Card({
   className = "",
 }: CardProps) {
   const displayPrice =
-    price === undefined ? undefined : typeof price === "number" ? `$${price.toFixed(2)}` : price;
+    price === undefined ? undefined : typeof price === "number" ? (
+      <span className="flex items-center gap-1">
+        <RiyalSymbol size={14} />
+        {price.toFixed(2)}
+      </span>
+    ) : price;
   const content = (
     <article
       className={`group rounded-xl bg-light-100 ring-1 ring-light-300 transition-colors hover:ring-dark-500 ${className}`}
