@@ -3,24 +3,43 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { getArrayParam, removeParams, toggleArrayParam } from "@/lib/utils/query";
+import { type Dictionary } from "@/components/internationalization/dictionaries";
 
-const GENDERS = ["men", "women", "unisex"] as const;
-const SIZES = ["XS", "S", "M", "L", "XL"] as const;
-const COLORS = ["black", "white", "red", "green", "blue", "grey"] as const;
-const PRICES = [
-  { id: "0-50", label: "0 - 50 SAR" },
-  { id: "50-100", label: "50 - 100 SAR" },
-  { id: "100-150", label: "100 - 150 SAR" },
-  { id: "150-", label: "Over 150 SAR" },
-] as const;
+interface FiltersProps {
+  dictionary: Dictionary;
+}
 
 type GroupKey = "gender" | "size" | "color" | "price";
 
-export default function Filters() {
+export default function Filters({ dictionary }: FiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const search = useMemo(() => `?${searchParams.toString()}`, [searchParams]);
+
+  const GENDERS = [
+    { id: "men", label: dictionary.filters.men },
+    { id: "women", label: dictionary.filters.women },
+    { id: "unisex", label: dictionary.filters.unisex },
+  ] as const;
+
+  const SIZES = ["XS", "S", "M", "L", "XL"] as const;
+
+  const COLORS = [
+    { id: "black", label: dictionary.filters.black },
+    { id: "white", label: dictionary.filters.white },
+    { id: "red", label: dictionary.filters.red },
+    { id: "green", label: dictionary.filters.green },
+    { id: "blue", label: dictionary.filters.blue },
+    { id: "grey", label: dictionary.filters.grey },
+  ] as const;
+
+  const PRICES = [
+    { id: "0-50", label: `0 - 50 ${dictionary.product.currency}` },
+    { id: "50-100", label: `50 - 100 ${dictionary.product.currency}` },
+    { id: "100-150", label: `100 - 150 ${dictionary.product.currency}` },
+    { id: "150-", label: `${dictionary.filters.over} 150 ${dictionary.product.currency}` },
+  ] as const;
 
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<Record<GroupKey, boolean>>({
@@ -84,36 +103,36 @@ export default function Filters() {
           onClick={() => setOpen(true)}
           aria-haspopup="dialog"
         >
-          Filters
+          {dictionary.filters.filters}
         </button>
         <button className="text-caption text-dark-700 underline" onClick={clearAll}>
-          Clear all
+          {dictionary.filters.clearAll}
         </button>
       </div>
 
       <aside className="sticky top-20 hidden h-fit min-w-60 rounded-lg border border-light-300 bg-light-100 p-4 md:block">
         <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-body-medium text-dark-900">Filters</h3>
+          <h3 className="text-body-medium text-dark-900">{dictionary.filters.filters}</h3>
           <button className="text-caption text-dark-700 underline" onClick={clearAll}>
-            Clear all
+            {dictionary.filters.clearAll}
           </button>
         </div>
 
-        <Group title={`Gender ${activeCounts.gender ? `(${activeCounts.gender})` : ""}`} k="gender">
+        <Group title={`${dictionary.filters.gender} ${activeCounts.gender ? `(${activeCounts.gender})` : ""}`} k="gender">
           <ul className="space-y-2">
             {GENDERS.map((g) => {
-              const checked = getArrayParam(search, "gender").includes(g);
+              const checked = getArrayParam(search, "gender").includes(g.id);
               return (
-                <li key={g} className="flex items-center gap-2">
+                <li key={g.id} className="flex items-center gap-2">
                   <input
-                    id={`gender-${g}`}
+                    id={`gender-${g.id}`}
                     type="checkbox"
                     className="h-4 w-4 accent-dark-900"
                     checked={checked}
-                    onChange={() => onToggle("gender" as GroupKey, g)}
+                    onChange={() => onToggle("gender" as GroupKey, g.id)}
                   />
-                  <label htmlFor={`gender-${g}`} className="text-body text-dark-900">
-                    {g[0].toUpperCase() + g.slice(1)}
+                  <label htmlFor={`gender-${g.id}`} className="text-body text-dark-900">
+                    {g.label}
                   </label>
                 </li>
               );
@@ -121,7 +140,7 @@ export default function Filters() {
           </ul>
         </Group>
 
-        <Group title={`Size ${activeCounts.size ? `(${activeCounts.size})` : ""}`} k="size">
+        <Group title={`${dictionary.filters.size} ${activeCounts.size ? `(${activeCounts.size})` : ""}`} k="size">
           <ul className="grid grid-cols-5 gap-2">
             {SIZES.map((s) => {
               const checked = getArrayParam(search, "size").includes(s);
@@ -142,21 +161,21 @@ export default function Filters() {
           </ul>
         </Group>
 
-        <Group title={`Color ${activeCounts.color ? `(${activeCounts.color})` : ""}`} k="color">
+        <Group title={`${dictionary.filters.color} ${activeCounts.color ? `(${activeCounts.color})` : ""}`} k="color">
           <ul className="grid grid-cols-2 gap-2">
             {COLORS.map((c) => {
-              const checked = getArrayParam(search, "color").includes(c);
+              const checked = getArrayParam(search, "color").includes(c.id);
               return (
-                <li key={c} className="flex items-center gap-2">
+                <li key={c.id} className="flex items-center gap-2">
                   <input
-                    id={`color-${c}`}
+                    id={`color-${c.id}`}
                     type="checkbox"
                     className="h-4 w-4 accent-dark-900"
                     checked={checked}
-                    onChange={() => onToggle("color", c)}
+                    onChange={() => onToggle("color", c.id)}
                   />
-                  <label htmlFor={`color-${c}`} className="text-body capitalize">
-                    {c}
+                  <label htmlFor={`color-${c.id}`} className="text-body capitalize">
+                    {c.label}
                   </label>
                 </li>
               );
@@ -164,7 +183,7 @@ export default function Filters() {
           </ul>
         </Group>
 
-        <Group title={`Price ${activeCounts.price ? `(${activeCounts.price})` : ""}`} k="price">
+        <Group title={`${dictionary.filters.price} ${activeCounts.price ? `(${activeCounts.price})` : ""}`} k="price">
           <ul className="space-y-2">
             {PRICES.map((p) => {
               const checked = getArrayParam(search, "price").includes(p.id);
@@ -196,28 +215,28 @@ export default function Filters() {
           />
           <div className="absolute inset-y-0 left-0 w-80 max-w-[80%] overflow-auto bg-light-100 p-4 shadow-xl">
             <div className="mb-2 flex items-center justify-between">
-              <h3 className="text-body-medium">Filters</h3>
+              <h3 className="text-body-medium">{dictionary.filters.filters}</h3>
               <button className="text-caption text-dark-700 underline" onClick={clearAll}>
-                Clear all
+                {dictionary.filters.clearAll}
               </button>
             </div>
             {/* Reuse the same desktop content by rendering the component again */}
             <div className="md:hidden">
-              <Group title="Gender" k="gender">
+              <Group title={dictionary.filters.gender} k="gender">
                 <ul className="space-y-2">
                   {GENDERS.map((g) => {
-                    const checked = getArrayParam(search, "gender").includes(g);
+                    const checked = getArrayParam(search, "gender").includes(g.id);
                     return (
-                      <li key={g} className="flex items-center gap-2">
+                      <li key={g.id} className="flex items-center gap-2">
                         <input
-                          id={`m-gender-${g}`}
+                          id={`m-gender-${g.id}`}
                           type="checkbox"
                           className="h-4 w-4 accent-dark-900"
                           checked={checked}
-                          onChange={() => onToggle("gender", g)}
+                          onChange={() => onToggle("gender", g.id)}
                         />
-                        <label htmlFor={`m-gender-${g}`} className="text-body">
-                          {g[0].toUpperCase() + g.slice(1)}
+                        <label htmlFor={`m-gender-${g.id}`} className="text-body">
+                          {g.label}
                         </label>
                       </li>
                     );
@@ -225,7 +244,7 @@ export default function Filters() {
                 </ul>
               </Group>
 
-              <Group title="Size" k="size">
+              <Group title={dictionary.filters.size} k="size">
                 <ul className="grid grid-cols-4 gap-2">
                   {SIZES.map((s) => {
                     const checked = getArrayParam(search, "size").includes(s);
@@ -246,21 +265,21 @@ export default function Filters() {
                 </ul>
               </Group>
 
-              <Group title="Color" k="color">
+              <Group title={dictionary.filters.color} k="color">
                 <ul className="grid grid-cols-2 gap-2">
                   {COLORS.map((c) => {
-                    const checked = getArrayParam(search, "color").includes(c);
+                    const checked = getArrayParam(search, "color").includes(c.id);
                     return (
-                      <li key={c} className="flex items-center gap-2">
+                      <li key={c.id} className="flex items-center gap-2">
                         <input
-                          id={`m-color-${c}`}
+                          id={`m-color-${c.id}`}
                           type="checkbox"
                           className="h-4 w-4 accent-dark-900"
                           checked={checked}
-                          onChange={() => onToggle("color", c)}
+                          onChange={() => onToggle("color", c.id)}
                         />
-                        <label htmlFor={`m-color-${c}`} className="text-body capitalize">
-                          {c}
+                        <label htmlFor={`m-color-${c.id}`} className="text-body capitalize">
+                          {c.label}
                         </label>
                       </li>
                     );
@@ -268,7 +287,7 @@ export default function Filters() {
                 </ul>
               </Group>
 
-              <Group title="Price" k="price">
+              <Group title={dictionary.filters.price} k="price">
                 <ul className="space-y-2">
                   {PRICES.map((p) => {
                     const checked = getArrayParam(search, "price").includes(p.id);

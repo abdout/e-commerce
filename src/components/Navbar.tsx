@@ -3,28 +3,40 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { Search, ShoppingCart } from "lucide-react";
+import LanguageSwitcher from "./LanguageSwitcher";
+import { type Dictionary } from "@/components/internationalization/dictionaries";
+import { type Locale } from "@/components/internationalization/config";
 
-const NAV_LINKS = [
-  { label: "Men", href: "/products?gender=men" },
-  { label: "Women", href: "/products?gender=women" },
-  { label: "Kids", href: "/products?gender=unisex" },
-  { label: "Collections", href: "/collections" },
-  { label: "Contact", href: "/contact" },
-] as const;
+interface NavbarProps {
+  dictionary: Dictionary;
+  lang: Locale;
+}
 
-export default function Navbar() {
+export default function Navbar({ dictionary, lang }: NavbarProps) {
   const [open, setOpen] = useState(false);
+
+  const NAV_LINKS = [
+    { label: dictionary.navigation.men, href: `/${lang}/products?gender=men` },
+    { label: dictionary.navigation.women, href: `/${lang}/products?gender=women` },
+    { label: dictionary.navigation.kids, href: `/${lang}/products?gender=unisex` },
+    { label: dictionary.navigation.products, href: `/${lang}/products` },
+  ] as const;
 
   return (
     <header className="sticky top-0 z-50 bg-light-100">
       <nav
-        className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
+        className="mx-auto flex h-16 max-w-7xl items-center px-4 sm:px-6 lg:px-8"
         aria-label="Primary"
       >
-        <Link href="/" aria-label="Nike Home" className="flex items-center">
-          <Image src="/logo.svg" alt="Nike" width={28} height={28} priority className="invert" />
-        </Link>
+        {/* Left Side - Logo */}
+        <div className="flex items-center flex-1">
+          <Link href={`/${lang}`} aria-label="Nike Home" className="flex items-center">
+            <Image src="/logo.svg" alt="Nike" width={28} height={28} priority className="invert" />
+          </Link>
+        </div>
 
+        {/* Center - Navigation Links */}
         <ul className="hidden items-center gap-8 md:flex">
           {NAV_LINKS.map((l) => (
             <li key={l.href}>
@@ -38,13 +50,24 @@ export default function Navbar() {
           ))}
         </ul>
 
-        <div className="hidden items-center gap-6 md:flex">
-          <button className="text-body text-dark-900 transition-colors hover:text-dark-700">
-            Search
+        {/* Right Side - Actions */}
+        <div className="hidden items-center gap-3 md:flex flex-1 justify-end">
+          <button
+            className="text-dark-900 transition-colors hover:text-dark-700"
+            aria-label={dictionary.navigation.search}
+          >
+            <Search size={20} />
           </button>
-          <button className="text-body text-dark-900 transition-colors hover:text-dark-700">
-            My Cart (2)
+          <button
+            className="relative text-dark-900 transition-colors hover:text-dark-700"
+            aria-label={dictionary.navigation.cart}
+          >
+            <ShoppingCart size={20} />
+            <span className="absolute -top-1 -right-1 bg-[#d33918] text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+              0
+            </span>
           </button>
+          <LanguageSwitcher currentLocale={lang} />
         </div>
 
         <button
@@ -54,7 +77,7 @@ export default function Navbar() {
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
         >
-          <span className="sr-only">Toggle navigation</span>
+          <span className="sr-only">{dictionary.navigation.menu}</span>
           <span className="mb-1 block h-0.5 w-6 bg-dark-900"></span>
           <span className="mb-1 block h-0.5 w-6 bg-dark-900"></span>
           <span className="block h-0.5 w-6 bg-dark-900"></span>
@@ -78,8 +101,20 @@ export default function Navbar() {
             </li>
           ))}
           <li className="flex items-center justify-between pt-2">
-            <button className="text-body">Search</button>
-            <button className="text-body">My Cart (2)</button>
+            <button className="flex items-center gap-2 text-body" aria-label={dictionary.navigation.search}>
+              <Search size={20} />
+              {dictionary.navigation.search}
+            </button>
+            <button className="relative flex items-center gap-2 text-body" aria-label={dictionary.navigation.cart}>
+              <ShoppingCart size={20} />
+              {dictionary.navigation.cart}
+              <span className="bg-[#d33918] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center ml-1">
+                0
+              </span>
+            </button>
+          </li>
+          <li className="pt-2">
+            <LanguageSwitcher currentLocale={lang} />
           </li>
         </ul>
       </div>

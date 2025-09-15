@@ -1,6 +1,6 @@
-import AuthForm from "@/components/AuthForm";
-import {signUp} from "@/lib/auth/actions";
+import { redirect } from "next/navigation";
+import { i18n } from "@/components/internationalization/config";
 
-export default function Page() {
-  return <AuthForm mode="sign-up" onSubmit={signUp} />;
+export default function SignUpRedirect() {
+  redirect(`/${i18n.defaultLocale}/sign-up`);
 }

@@ -3,14 +3,18 @@
 import { useState } from "react";
 import Link from "next/link";
 import SocialProviders from "./SocialProviders";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
+import { type Dictionary } from "@/components/internationalization/dictionaries";
+import { type Locale } from "@/components/internationalization/config";
 
 type Props = {
   mode: "sign-in" | "sign-up";
   onSubmit: (formData: FormData) => Promise<{ ok: boolean; userId?: string } | void>;
+  dictionary: Dictionary;
+  lang: Locale;
 };
 
-export default function AuthForm({ mode, onSubmit }: Props) {
+export default function AuthForm({ mode, onSubmit, dictionary, lang }: Props) {
   const [show, setShow] = useState(false);
   const router = useRouter();
 
@@ -22,7 +26,7 @@ export default function AuthForm({ mode, onSubmit }: Props) {
     try {
       const result = await onSubmit(formData);
 
-      if(result?.ok) router.push("/");
+      if(result?.ok) router.push(`/${lang}`);
     } catch (e) {
       console.log("error", e);
     }
@@ -32,27 +36,27 @@ export default function AuthForm({ mode, onSubmit }: Props) {
     <div className="space-y-6">
       <div className="text-center">
         <p className="text-caption text-dark-700">
-          {mode === "sign-in" ? "Don’t have an account? " : "Already have an account? "}
-          <Link href={mode === "sign-in" ? "/sign-up" : "/sign-in"} className="underline">
-            {mode === "sign-in" ? "Sign Up" : "Sign In"}
+          {mode === "sign-in" ? dictionary.auth.dontHaveAccount : dictionary.auth.alreadyHaveAccount}
+          <Link href={`/${lang}/${mode === "sign-in" ? "sign-up" : "sign-in"}`} className="underline">
+            {mode === "sign-in" ? dictionary.auth.signUp : dictionary.auth.signIn}
           </Link>
         </p>
         <h1 className="mt-3 text-heading-3 text-dark-900">
-          {mode === "sign-in" ? "Welcome Back!" : "Join Nike Today!"}
+          {mode === "sign-in" ? dictionary.auth.welcomeBack : dictionary.auth.joinNike}
         </h1>
         <p className="mt-1 text-body text-dark-700">
           {mode === "sign-in"
-            ? "Sign in to continue your journey"
-            : "Create your account to start your fitness journey"}
+            ? dictionary.auth.signInToContinue
+            : dictionary.auth.createAccount}
         </p>
       </div>
 
-      <SocialProviders variant={mode} />
+      <SocialProviders variant={mode} dictionary={dictionary} />
 
       <div className="flex items-center gap-4">
         <hr className="h-px w-full border-0 bg-light-300" />
         <span className="shrink-0 text-caption text-dark-700">
-          Or {mode === "sign-in" ? "sign in" : "sign up"} with
+          {dictionary.auth.orSignWith}
         </span>
         <hr className="h-px w-full border-0 bg-light-300" />
       </div>
@@ -64,13 +68,13 @@ export default function AuthForm({ mode, onSubmit }: Props) {
         {mode === "sign-up" && (
           <div className="space-y-1">
             <label htmlFor="name" className="text-caption text-dark-900">
-              Name
+              {dictionary.auth.name}
             </label>
             <input
               id="name"
               name="name"
               type="text"
-              placeholder="Enter your name"
+              placeholder={dictionary.auth.enterYourName}
               className="w-full rounded-xl border border-light-300 bg-light-100 px-4 py-3 text-body text-dark-900 placeholder:text-dark-500 focus:outline-none focus:ring-2 focus:ring-dark-900/10"
               autoComplete="name"
             />
@@ -79,13 +83,13 @@ export default function AuthForm({ mode, onSubmit }: Props) {
 
         <div className="space-y-1">
           <label htmlFor="email" className="text-caption text-dark-900">
-            Email
+            {dictionary.auth.email}
           </label>
           <input
             id="email"
             name="email"
             type="email"
-            placeholder="johndoe@gmail.com"
+            placeholder={dictionary.auth.emailPlaceholder}
             className="w-full rounded-xl border border-light-300 bg-light-100 px-4 py-3 text-body text-dark-900 placeholder:text-dark-500 focus:outline-none focus:ring-2 focus:ring-dark-900/10"
             autoComplete="email"
             required
@@ -94,14 +98,14 @@ export default function AuthForm({ mode, onSubmit }: Props) {
 
         <div className="space-y-1">
           <label htmlFor="password" className="text-caption text-dark-900">
-            Password
+            {dictionary.auth.password}
           </label>
           <div className="relative">
             <input
               id="password"
               name="password"
               type={show ? "text" : "password"}
-              placeholder="minimum 8 characters"
+              placeholder={dictionary.auth.passwordPlaceholder}
               className="w-full rounded-xl border border-light-300 bg-light-100 px-4 py-3 pr-12 text-body text-dark-900 placeholder:text-dark-500 focus:outline-none focus:ring-2 focus:ring-dark-900/10"
               autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
               minLength={8}
@@ -111,9 +115,9 @@ export default function AuthForm({ mode, onSubmit }: Props) {
               type="button"
               className="absolute inset-y-0 right-0 px-3 text-caption text-dark-700"
               onClick={() => setShow((v) => !v)}
-              aria-label={show ? "Hide password" : "Show password"}
+              aria-label={show ? dictionary.auth.hidePassword : dictionary.auth.showPassword}
             >
-              {show ? "Hide" : "Show"}
+              {show ? dictionary.auth.hide : dictionary.auth.show}
             </button>
           </div>
         </div>
@@ -122,18 +126,18 @@ export default function AuthForm({ mode, onSubmit }: Props) {
           type="submit"
           className="mt-2 w-full rounded-full bg-dark-900 px-6 py-3 text-body-medium text-light-100 hover:bg-dark-700 focus:outline-none focus:ring-2 focus:ring-dark-900/20"
         >
-          {mode === "sign-in" ? "Sign In" : "Sign Up"}
+          {mode === "sign-in" ? dictionary.auth.signIn : dictionary.auth.signUp}
         </button>
 
         {mode === "sign-up" && (
           <p className="text-center text-footnote text-dark-700">
-            By signing up, you agree to our{" "}
-            <a href="#" className="underline">
-              Terms of Service
+            {dictionary.auth.bySigningUp}{" "}
+            <a href={`/${lang}`} className="underline">
+              {dictionary.auth.termsOfService}
             </a>{" "}
-            and{" "}
-            <a href="#" className="underline">
-              Privacy Policy
+            {dictionary.auth.and}{" "}
+            <a href={`/${lang}`} className="underline">
+              {dictionary.auth.privacyPolicy}
             </a>
           </p>
         )}

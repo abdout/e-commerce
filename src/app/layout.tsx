@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
-import { Jost } from "next/font/google";
+import { Inter, Rubik } from "next/font/google";
 import "./globals.css";
 
-const jost = Jost({
-  variable: "--font-jost",
-  subsets: ["latin"],
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap'
+});
+
+const rubik = Rubik({
+  subsets: ['arabic', 'latin'],
+  variable: '--font-rubik',
+  display: 'swap'
 });
 
 export const metadata: Metadata = {
@@ -18,8 +25,10 @@ export default function RootShell({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${jost.className} antialiased`}>{children}</body>
+    <html suppressHydrationWarning>
+      <body className={`${inter.variable} ${rubik.variable} antialiased`}>
+        {children}
+      </body>
     </html>
   );
 }

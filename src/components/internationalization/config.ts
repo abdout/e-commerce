@@ -1,6 +1,6 @@
 export const i18n = {
   defaultLocale: 'en',
-  locales: ['en', 'ar'], // Add your supported locales
+  locales: ['en', 'ar'], // English and Arabic for Nike Store
 } as const;
 
 export type Locale = (typeof i18n)['locales'][number];
@@ -13,7 +13,8 @@ export const localeConfig = {
     dir: 'ltr',
     flag: '🇺🇸',
     dateFormat: 'MM/dd/yyyy',
-    currency: 'USD',
+    currency: 'SAR', // Using SAR for Saudi market
+    currencySymbol: 'SAR',
   },
   'ar': {
     name: 'Arabic',
@@ -22,6 +23,7 @@ export const localeConfig = {
     flag: '🇸🇦',
     dateFormat: 'dd/MM/yyyy',
     currency: 'SAR',
+    currencySymbol: 'ر.س',
   },
 } as const;
 

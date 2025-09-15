@@ -57,3 +57,12 @@
   --text-footnote--line-height: 18px;
   --text-footnote--font-weight: 400;
 }
+
+/* Font utilities */
+.font-inter {
+  font-family: var(--font-inter), sans-serif;
+}
+
+.font-rubik {
+  font-family: var(--font-rubik), sans-serif;
+}

@@ -1,6 +1,6 @@
-import AuthForm from "@/components/AuthForm";
-import {signIn} from "@/lib/auth/actions";
+import { redirect } from "next/navigation";
+import { i18n } from "@/components/internationalization/config";
 
-export default function Page() {
-  return <AuthForm mode="sign-in" onSubmit={signIn} />;
+export default function SignInRedirect() {
+  redirect(`/${i18n.defaultLocale}/sign-in`);
 }
